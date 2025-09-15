@@ -598,6 +598,8 @@ class MJCFLoader:
         if len(joints) == 0:
             joints = [ET.Element("joint", attrib=dict(type="fixed"))]
         for i, joint in enumerate(joints):
+            if joint.attrib.get("type", "") == "free":
+                continue
             # note there can be multiple joints here. We create some dummy links to simulate that
             incoming_attributes = []
             if "joint" in defaults:
@@ -797,7 +799,16 @@ class MJCFLoader:
         actor_builders: List[ActorBuilder] = []
         for i, body in enumerate(xml.find("worldbody").findall("body")):
             # determine first if this body is really an articulation or a actor
-            has_freejoint = body.find("freejoint") is not None
+            def check_has_freejoint(body_xml: ET.Element) -> bool:
+                has_freejoint_elm = body_xml.find("freejoint") is not None
+                has_joint_of_freetype = False
+                for joint_xml in body_xml.findall("joint"):
+                    if joint_xml.attrib.get("type", "") == "free":
+                        has_joint_of_freetype = True
+                        break
+                return has_freejoint_elm or has_joint_of_freetype
+
+            has_freejoint = check_has_freejoint(body)
 
             def has_joint(body):
                 if body.find("joint") is not None:
