@@ -605,9 +605,9 @@ class MJCFLoader:
             if "joint" in defaults:
                 incoming_attributes.append(defaults["joint"])
             if "class" in joint.attrib:
-                incoming_attributes.append(
-                    self._defaults[joint.attrib["class"]]["joint"]
-                )
+                jnt_defaults = self._defaults[joint.attrib["class"]]
+                if "joint" in jnt_defaults:
+                    incoming_attributes.append(jnt_defaults["joint"])
             incoming_attributes.append(joint.attrib)
             joint_attrib = _merge_attrib(dict(), incoming_attributes)
 
