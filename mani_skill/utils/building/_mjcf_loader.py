@@ -209,6 +209,9 @@ class MJCFLoader:
         self._link2parent_joint: Dict[str, Any] = dict()
         self._group_count = 0
 
+        self._model_name = ""
+        self._nbody = 0
+
     def set_scene(self, scene):
         self.scene = scene
         return self
@@ -582,7 +585,8 @@ class MJCFLoader:
         else:
             body_attrib = body.attrib
 
-        body_name = body_attrib["name"]
+        self._nbody += 1
+        body_name = body_attrib.get("name", f"{self._model_name}_body_{self._nbody}")
         body_pos = _parse_vec(body_attrib, "pos", (0.0, 0.0, 0.0))
         body_ori = _parse_orientation(
             body_attrib, use_degrees=self._use_degrees, euler_seq=self._euler_seq
@@ -741,6 +745,7 @@ class MJCFLoader:
         """Helper function for self.parse"""
         xml: Element = ET.fromstring(mjcf_string.encode("utf-8"))
         self.xml = xml
+        self._model_name = xml.attrib.get("model", "")
         # handle includes
         for include in xml.findall("include"):
             include_file = include.attrib["file"]
