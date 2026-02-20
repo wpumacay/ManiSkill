@@ -432,8 +432,10 @@ class BaseEnv(gym.Env):
                 agents.append(agent)
         if len(agents) == 1:
             self.agent = agents[0]
-        else:
+        elif len(agents) >= 2:
             self.agent = MultiAgent(agents)
+        else:
+            self.agent = None
 
     @property
     def _default_sensor_configs(
@@ -553,7 +555,7 @@ class BaseEnv(gym.Env):
     def _get_obs_agent(self):
         """Get observations about the agent's state. By default it is proprioceptive observations which include qpos and qvel.
         Controller state is also included although most default controllers do not have any state."""
-        return self.agent.get_proprioception()
+        return self.agent.get_proprioception() if self.agent else {}
 
     def _get_obs_extra(self, info: dict):
         """Get task-relevant extra observations. Usually defined on a task by task basis"""
@@ -1274,9 +1276,9 @@ class BaseEnv(gym.Env):
         Get environment state dictionary. Override to include task information (e.g., goal)
         """
         sim_state = self.scene.get_sim_state()
-        controller_state = self.agent.get_controller_state()
+        controller_state = self.agent.get_controller_state() if self.agent else {}
         # Remove any empty keys from controller_state
-        if isinstance(self.agent.controller, dict):
+        if self.agent and isinstance(self.agent.controller, dict):
             controller_state = {k: v for k, v in controller_state.items() if len(v) > 0}
         if len(controller_state) > 0:
             sim_state["controller"] = controller_state
