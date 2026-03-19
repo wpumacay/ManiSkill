@@ -425,7 +425,8 @@ class BaseBridgeEnv(BaseDigitalTwinEnv):
                 self.agent.robot.set_pose(
                     sapien.Pose([0.127, 0.060, 0.85], q=[0, 0, 0, 1])
                 )
-            self.agent.reset(init_qpos=qpos)
+            if isinstance(self.agent, WidowX250S):
+                self.agent.reset(init_qpos=qpos)
 
             # figure out object bounding boxes after settling. This is used to determine if an object is near the target object
             self.episode_source_obj_xyz_after_settle = self.objs[
