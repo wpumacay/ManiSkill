@@ -137,18 +137,16 @@ class PutEggplantInBasketScene(BaseBridgeEnv):
     def get_language_instruction(self, **kwargs):
         return ["put eggplant into yellow basket"] * self.num_envs
 
-    def _load_lighting(self, options):
-        self.enable_shadow
-
-        self.scene.set_ambient_light([0.3, 0.3, 0.3])
-        self.scene.add_directional_light(
-            [0, 0, -1],
-            [0.3, 0.3, 0.3],
-            position=[0, 0, 1],
-            shadow=False,
-            shadow_scale=5,
-            shadow_map_size=2048,
-        )
+    # def _load_lighting(self, options):
+    #     self.scene.set_ambient_light([0.3, 0.3, 0.3])
+    #     self.scene.add_directional_light(
+    #         [0, 0, -1],
+    #         [0.3, 0.3, 0.3],
+    #         position=[0, 0, 1],
+    #         shadow=False,
+    #         shadow_scale=5,
+    #         shadow_map_size=2048,
+    #     )
 
 
 @register_env(
