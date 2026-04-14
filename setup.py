@@ -97,7 +97,7 @@ def main(argv):
         install_requires=get_dependencies(),
         # Glob patterns do not automatically match dotfiles
         package_data={
-            "mani_skill": ["assets/**", "envs/**/*", "utils/**/*", "shaders/default-mj/**", "shaders/rt-fast-mj/**"],
+            "mani_skill": ["assets/**", "envs/**/*", "utils/**/*", "shaders/common/**", "shaders/default-mj/**", "shaders/rt-fast-mj/**"],
             "warp_maniskill.warp": ["native/*", "native/nanovdb/*"],
         },
         extras_require={
