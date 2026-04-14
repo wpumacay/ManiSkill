@@ -1,11 +1,14 @@
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from pathlib import Path
+from typing import Any
 
 import sapien
 import torch
 
 from mani_skill.render.version import SAPIEN_RENDER_SYSTEM
 
+EXTRA_SHADERS_FOLDER = Path(__file__).parent.parent / "shaders"
 
 @dataclass
 class ShaderConfig:
@@ -100,6 +103,24 @@ PREBUILT_SHADER_CONFIGS = {
             "Albedo": lambda data: {"albedo": (data[..., :3] * 255).to(torch.uint8)},
         },
     ),
+    "default-mj": ShaderConfig(
+        shader_pack=(EXTRA_SHADERS_FOLDER / "default-mj").as_posix(),
+        texture_names={
+            "Color": ["rgb"],
+            "Position": ["position", "depth"],
+            "Segmentation": ["segmentation"],
+            "Normal": ["normal"],
+            "Albedo": ["albedo"],
+        },
+        texture_transforms={
+            "Color": lambda data: {"rgb": (data[..., :3] * 255).to(torch.uint8)},
+            "Position": default_position_texture_transform,
+            # note in default shader pack, 0 is visual shape / mesh, 1 is actor/link level, 2 is parallel scene ID, 3 is unused
+            "Segmentation": lambda data: {"segmentation": data[..., 1][..., None]},
+            "Normal": lambda data: {"normal": data[..., :3]},
+            "Albedo": lambda data: {"albedo": (data[..., :3] * 255).to(torch.uint8)},
+        },
+    ),
     "rt": ShaderConfig(
         shader_pack="rt",
         texture_names=rt_texture_names,
@@ -130,6 +151,17 @@ PREBUILT_SHADER_CONFIGS = {
         },
         texture_transforms=rt_texture_transforms,
     ),
+    "rt-fast-mj": ShaderConfig(
+        shader_pack=(EXTRA_SHADERS_FOLDER / "rt-fast-mj").as_posix(),
+        texture_names=rt_texture_names,
+        shader_pack_config={
+            "ray_tracing_samples_per_pixel": 2,
+            "ray_tracing_path_depth": 1,
+            "ray_tracing_denoiser": "optix",
+        },
+        texture_transforms=rt_texture_transforms,
+    ),
+
 }
 """pre-defined shader configs"""
 
